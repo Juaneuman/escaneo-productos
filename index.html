@@ -34,10 +34,18 @@
     <script>
         // Base de datos de productos simulada
         const productsDB = {
-            "123456789": { name: "Producto A", price: 100 },
-            "987654321": { name: "Producto B", price: 200 },
-            "555555555": { name: "Producto C", price: 150 }
-        };
+    "123456789": { name: "Audífonos Lenovo", price: 25000 },
+    "987654321": { name: "Soporte Bicicleta", price: 12000 },
+    "555555555": { name: "Batería Portátil", price: 35000 },
+    "111111111": { name: "Cargador iPhone", price: 18000 },
+    "222222222": { name: "Cable USB-C", price: 8000 },
+    "333333333": { name: "Funda Celular", price: 10000 },
+    "444444444": { name: "Teclado Mecánico", price: 45000 },
+    "555555556": { name: "Mouse Gamer", price: 22000 },
+    "666666666": { name: "Power Bank Solar", price: 50000 },
+    "777777777": { name: "Altavoz Bluetooth", price: 30000 }
+};
+
 
         // Variables
         const cart = [];
@@ -64,10 +72,21 @@
         });
 
         // Función para agregar productos al carrito
-        function addToCart(product) {
-            cart.push(product);
-            updateCart();
+function addToCart(product) {
+    // Verificar si el producto ya está en el carrito
+    const existingProduct = cart.find(item => item.name === product.name);
+    
+    if (existingProduct) {
+        // Preguntar si desea agregarlo de nuevo
+        const confirmAdd = confirm(`El producto "${product.name}" ya está en el carrito. ¿Deseas agregarlo nuevamente?`);
+        if (!confirmAdd) {
+            return; // Salir si no se quiere agregar
         }
+    }
+    
+    // Agregar el producto al carrito
+    cart.push(product);
+    updateCart();
 
         // Actualizar el carrito
         function updateCart() {
