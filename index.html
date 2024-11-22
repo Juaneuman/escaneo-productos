@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras</title>
+    <title>Escáner de Productos con Foto</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        #camera { width: 100%; max-width: 400px; margin-bottom: 20px; }
+        #camera { display: none; }
+        canvas { display: none; }
+        img { max-width: 100%; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         table, th, td { border: 1px solid black; }
         th, td { padding: 10px; text-align: center; }
@@ -14,8 +16,12 @@
 </head>
 <body>
     <h1>Escáner de Productos</h1>
+    <button id="captureButton">Tomar Foto</button>
     <video id="camera" autoplay></video>
-    <p id="output">Escaneando...</p>
+    <canvas id="canvas"></canvas>
+    <img id="photo" alt="Captura">
+
+    <p id="output">Esperando escaneo...</p>
 
     <h2>Carrito de Compras</h2>
     <table>
@@ -47,46 +53,67 @@
         };
 
         // Variables
-        const cart = [];
         const cameraElement = document.getElementById('camera');
+        const canvasElement = document.getElementById('canvas');
+        const photoElement = document.getElementById('photo');
+        const captureButton = document.getElementById('captureButton');
         const outputElement = document.getElementById('output');
         const cartElement = document.getElementById('cart');
         const totalElement = document.getElementById('total');
+        const cart = [];
 
-        // Inicializar lector de código de barras
-        const codeReader = new ZXing.BrowserBarcodeReader();
+        // Inicializar cámara
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                cameraElement.srcObject = stream;
+                cameraElement.play();
+            })
+            .catch((err) => {
+                console.error("No se pudo acceder a la cámara:", err);
+                alert("Por favor, permite el acceso a la cámara.");
+            });
 
-        // Activar la cámara y empezar a escanear
-        codeReader.decodeFromVideoDevice(undefined, cameraElement, (result, err) => {
-            if (result) {
-                const code = result.text.trim();
-                outputElement.textContent = `Código escaneado: ${code}`;
+        // Capturar foto
+        captureButton.addEventListener('click', () => {
+            const context = canvasElement.getContext('2d');
+            canvasElement.width = cameraElement.videoWidth;
+            canvasElement.height = cameraElement.videoHeight;
+            context.drawImage(cameraElement, 0, 0, canvasElement.width, canvasElement.height);
 
-                // Buscar producto en la base de datos
-                if (productsDB[code]) {
-                    addToCart(productsDB[code]);
-                } else {
-                    alert("Producto no encontrado");
-                }
-            } else if (err) {
-                console.error(err);
-            }
-        }).catch(err => {
-            console.error("No se pudo acceder a la cámara:", err);
-            alert("Por favor, permite el acceso a la cámara para escanear productos.");
+            // Mostrar foto
+            const dataUrl = canvasElement.toDataURL('image/png');
+            photoElement.src = dataUrl;
+
+            // Procesar código de barras
+            const codeReader = new ZXing.BrowserBarcodeReader();
+            codeReader.decodeFromImage(canvasElement)
+                .then((result) => {
+                    const code = result.text.trim();
+                    outputElement.textContent = `Código escaneado: ${code}`;
+
+                    if (productsDB[code]) {
+                        addToCart(productsDB[code]);
+                    } else {
+                        alert("Producto no encontrado");
+                    }
+                })
+                .catch((err) => {
+                    console.error("Error al escanear el código de barras:", err);
+                    alert("No se pudo leer el código de barras. Intenta nuevamente.");
+                });
         });
 
         // Función para agregar productos al carrito
         function addToCart(product) {
             const existingProduct = cart.find(item => item.name === product.name);
-            
+
             if (existingProduct) {
                 const confirmAdd = confirm(`El producto "${product.name}" ya está en el carrito. ¿Deseas agregarlo nuevamente?`);
                 if (!confirmAdd) {
                     return;
                 }
             }
-            
+
             cart.push(product);
             updateCart();
         }
@@ -115,9 +142,6 @@
             cart.splice(index, 1);
             updateCart();
         }
-
-        // Actualizar el carrito al cargar la página
-        updateCart();
     </script>
 </body>
 </html>
