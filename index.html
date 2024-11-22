@@ -59,7 +59,7 @@
         // Activar la cámara y empezar a escanear
         codeReader.decodeFromVideoDevice(undefined, cameraElement, (result, err) => {
             if (result) {
-                const code = result.text;
+                const code = result.text.trim();
                 outputElement.textContent = `Código escaneado: ${code}`;
 
                 // Buscar producto en la base de datos
