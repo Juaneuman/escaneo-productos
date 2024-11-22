@@ -1,17 +1,19 @@
-// Base de datos de productos simulada
-const productsDB = {
-    "123456789": { name: "Audífonos Lenovo", price: 15000 },
-    "987654321": { name: "Soporte Bicicleta", price: 12000 },
-    "555555555": { name: "Batería Portátil", price: 14000 },
-    "111111111": { name: "Cargador iPhone", price: 13000 },
-    "222222222": { name: "Cable USB-C", price: 8000 },
-    "333333333": { name: "Funda Celular", price: 5000 },
-    "444444444": { name: "Teclado Mecánico", price: 15000 },
-    "555555556": { name: "Mouse Gamer", price: 14000 },
-    "666666666": { name: "Power Bank Solar", price: 14500 },
-    "777777777": { name: "Altavoz Bluetooth", price: 11000 }
-};
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #camera { width: 100%; max-width: 400px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid black; }
+        th, td { padding: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Escáner de Productos</h1>
 // Cargar carrito desde Local Storage (si existe)
 const savedCart = localStorage.getItem("cart");
 const cart = savedCart ? JSON.parse(savedCart) : [];
@@ -87,3 +89,7 @@ function removeFromCart(index) {
 
 // Cargar carrito al inicio
 updateCart();
+
+    </script>
+</body>
+</html>
